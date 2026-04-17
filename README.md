@@ -163,5 +163,5 @@ HAVING COUNT(*) > 1;
 ## Course Details
 
 - **Course:** Database Systems (BCSE302L)
-- **Institution:** Vellore Institute of Technology, Vellore
+- **Institution:** Vellore Institute of Technology, Chennai
 - **Academic Year:** 2025–2026
