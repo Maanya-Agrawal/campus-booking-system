@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusBook — VIT Resource Booking</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161d;
+    --bg3: #1a1e27;
+    --bg4: #20253100;
+    --card: #171b24;
+    --card2: #1e2330;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --text2: #8b90a0;
+    --text3: #555b6e;
+    --accent: #5b8af0;
+    --accent2: #3d6de0;
+    --accent-glow: rgba(91,138,240,0.15);
+    --green: #3ecf8e;
+    --green-bg: rgba(62,207,142,0.1);
+    --amber: #f5a623;
+    --amber-bg: rgba(245,166,35,0.1);
+    --red: #f06060;
+    --red-bg: rgba(240,96,96,0.1);
+    --teal: #38bdf8;
+    --teal-bg: rgba(56,189,248,0.1);
+    --purple: #a78bfa;
+    --purple-bg: rgba(167,139,250,0.1);
+    --radius: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    flex-shrink: 0;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-icon svg { width: 16px; height: 16px; fill: white; }
+
+  .logo-text {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .sidebar-nav {
+    padding: 14px 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 10px 4px;
+    font-weight: 500;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--text2);
+    font-weight: 400;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: var(--accent-glow); color: var(--accent); font-weight: 500; }
+
+  .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active svg { opacity: 1; }
+
+  .sidebar-user {
+    padding: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-chip {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    background: var(--bg3);
+    cursor: pointer;
+  }
+
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: white; flex-shrink: 0;
+  }
+
+  .user-info-name { font-size: 12.5px; font-weight: 500; }
+  .user-info-role { font-size: 11px; color: var(--text3); }
+
+  /* MAIN */
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .page-title { font-size: 15px; font-weight: 500; }
+  .page-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-size: 12.5px; font-weight: 500;
+    cursor: pointer; border: none;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .btn svg { width: 13px; height: 13px; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost { background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); }
+  .btn-ghost:hover { color: var(--text); background: var(--card2); }
+  .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid rgba(240,96,96,0.2); }
+  .btn-success { background: var(--green-bg); color: var(--green); border: 1px solid rgba(62,207,142,0.2); }
+
+  /* CONTENT AREA */
+  .content {
+    padding: 28px;
+    flex: 1;
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ===== DASHBOARD ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .stat-card.blue::before { background: var(--accent); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.amber::before { background: var(--amber); }
+  .stat-card.purple::before { background: var(--purple); }
+
+  .stat-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .stat-icon svg { width: 16px; height: 16px; }
+  .stat-icon.blue { background: var(--accent-glow); color: var(--accent); }
+  .stat-icon.green { background: var(--green-bg); color: var(--green); }
+  .stat-icon.amber { background: var(--amber-bg); color: var(--amber); }
+  .stat-icon.purple { background: var(--purple-bg); color: var(--purple); }
+
+  .stat-value { font-size: 28px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+  .stat-change { font-size: 11px; color: var(--green); margin-top: 8px; }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 18px;
+  }
+
+  .section-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .section-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title { font-size: 13px; font-weight: 500; }
+  .section-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 500;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); }
+  .badge-red { background: var(--red-bg); color: var(--red); }
+  .badge-blue { background: var(--accent-glow); color: var(--accent); }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); }
+  .badge-teal { background: var(--teal-bg); color: var(--teal); }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    font-size: 11px; color: var(--text3); font-weight: 500;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 10px 20px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 13px 20px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .resource-name { font-weight: 500; font-size: 13px; }
+  .resource-type { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* Activity feed */
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .activity-item:last-child { border-bottom: none; }
+
+  .activity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 4px;
+  }
+
+  .activity-text { font-size: 12.5px; line-height: 1.5; }
+  .activity-text strong { font-weight: 500; }
+  .activity-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* RESOURCE GRID */
+  .filters-bar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .search-wrap {
+    flex: 1; position: relative;
+  }
+  .search-wrap svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 14px; height: 14px; color: var(--text3);
+  }
+  .search-input {
+    width: 100%; background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 9px 12px 9px 36px;
+    font-size: 13px; color: var(--text);
+    font-family: inherit; outline: none;
+  }
+  .search-input::placeholder { color: var(--text3); }
+  .search-input:focus { border-color: var(--accent); }
+
+  .filter-select {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 9px 14px;
+    font-size: 13px; color: var(--text2);
+    font-family: inherit; outline: none; cursor: pointer;
+  }
+  .filter-select:focus { border-color: var(--accent); }
+
+  .resources-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .resource-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .resource-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+  .resource-card-img {
+    height: 100px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    position: relative;
+  }
+  .rc-hall { background: linear-gradient(135deg, #1a2040 0%, #0d1530 100%); }
+  .rc-lab { background: linear-gradient(135deg, #0d2020 0%, #0a1a1a 100%); }
+  .rc-classroom { background: linear-gradient(135deg, #1f1a30 0%, #130d25 100%); }
+
+  .availability-dot {
+    position: absolute; top: 10px; right: 10px;
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  .resource-card-body { padding: 16px; }
+  .resource-card-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .resource-card-loc { font-size: 12px; color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }
+  .resource-card-loc svg { width: 11px; height: 11px; }
+
+  .resource-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .cap-info { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+  .cap-info svg { width: 12px; height: 12px; }
+
+  /* BOOKING MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-xl);
+    width: 480px;
+    padding: 28px;
+    position: relative;
+  }
+
+  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .modal-sub { font-size: 12.5px; color: var(--text3); margin-bottom: 22px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; display: block; font-weight: 500; }
+  .form-input {
+    width: 100%; background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 9px 12px;
+    font-size: 13px; color: var(--text);
+    font-family: inherit; outline: none;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; }
+
+  .close-btn {
+    position: absolute; top: 18px; right: 18px;
+    background: none; border: none; cursor: pointer; color: var(--text3);
+    width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  }
+  .close-btn:hover { background: var(--bg3); color: var(--text); }
+
+  /* MY BOOKINGS */
+  .bookings-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .booking-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex; align-items: center; gap: 16px;
+  }
+
+  .booking-date-block {
+    text-align: center;
+    background: var(--bg3);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    min-width: 56px;
+    flex-shrink: 0;
+  }
+  .booking-month { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .booking-day { font-size: 22px; font-weight: 600; line-height: 1.1; color: var(--accent); }
+
+  .booking-details { flex: 1; }
+  .booking-purpose { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .booking-resource { font-size: 12.5px; color: var(--text2); display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .booking-time { font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 4px; }
+
+  .booking-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+
+  /* ADMIN PANEL */
+  .admin-tabs {
+    display: flex; gap: 4px; margin-bottom: 22px;
+    background: var(--card); border-radius: var(--radius-lg); padding: 4px;
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+  .admin-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 13px; cursor: pointer; border: none; background: none;
+    color: var(--text2); font-family: inherit; font-weight: 400;
+    transition: all 0.15s;
+  }
+  .admin-tab.active { background: var(--bg3); color: var(--text); font-weight: 500; }
+
+  .pending-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .pending-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .pending-body {
+    padding: 16px 20px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .info-block { }
+  .info-key { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .info-val { font-size: 13px; font-weight: 500; }
+
+  .pending-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.01);
+  }
+
+  .pending-note { font-size: 12px; color: var(--text3); font-style: italic; }
+
+  /* USAGE HISTORY TABLE */
+  .history-wrap { overflow-x: auto; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 14px; }
+  .empty-title { font-size: 15px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; }
+
+  /* NOTIFICATION */
+  .notif {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--radius-lg); padding: 14px 18px;
+    font-size: 13px; display: flex; align-items: center; gap: 10px;
+    z-index: 500; transform: translateY(80px); opacity: 0;
+    transition: all 0.3s; pointer-events: none;
+  }
+  .notif.show { transform: translateY(0); opacity: 1; }
+  .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">CampusBook</div>
+        <div class="logo-sub">VIT</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <button class="nav-item active" onclick="showView('dashboard', this)">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="showView('resources', this)">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v2a1 1 0 01-1 1H3a1 1 0 01-1-1V3zm0 6a1 1 0 011-1h10a1 1 0 011 1v2a1 1 0 01-1 1H3a1 1 0 01-1-1V9z"/></svg>
+      Browse Resources
+    </button>
+    <button class="nav-item" onclick="showView('mybookings', this)">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V5l-4-4H4zm4 0l3 3h-3V1zM5 8h6v1H5V8zm0 2h6v1H5v-1zm0 2h4v1H5v-1z"/></svg>
+      My Bookings
+    </button>
+
+    <div class="nav-section-label" style="margin-top:8px">Administration</div>
+    <button class="nav-item" onclick="showView('admin', this)">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zM3 13c0-2.76 2.24-5 5-5s5 2.24 5 5H3z"/><circle cx="13" cy="5" r="2.5" fill="#f5a623"/></svg>
+      Admin Panel
+    </button>
+  </nav>
+
+  <div class="sidebar-user">
+    <div class="user-chip">
+      <div class="avatar">MA</div>
+      <div>
+        <div class="user-info-name">Maanya Agrawal</div>
+        <div class="user-info-role">Student · CSE</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN AREA -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar" id="topbar">
+    <div>
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="page-sub" id="page-sub">Monday, 30 March 2026</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="showView('resources', document.querySelector('.nav-item:nth-child(3)'))">
+        <svg viewBox="0 0 16 16" fill="currentColor" style="width:13px;height:13px"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm1 10H7V7h2v4zm0-6H7V3h2v2z"/></svg>
+        Book a Resource
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ======================== DASHBOARD ======================== -->
+    <div class="view active" id="view-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon blue">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V5l-4-4H4zm4 0l3 3h-3V1z"/></svg>
+          </div>
+          <div class="stat-value">6</div>
+          <div class="stat-label">Total Bookings</div>
+          <div class="stat-change">↑ 2 this week</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon green">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm3.3 5.3l-4 4a1 1 0 01-1.4 0l-2-2 1.4-1.4L7 8.6l3.3-3.3 1.4 1.4z"/></svg>
+          </div>
+          <div class="stat-value">4</div>
+          <div class="stat-label">Approved</div>
+          <div class="stat-change" style="color:var(--green)">↑ Active bookings</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon amber">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm1 10H7V7h2v4zm0-6H7V3h2v2z"/></svg>
+          </div>
+          <div class="stat-value">5</div>
+          <div class="stat-label">Resources Available</div>
+          <div class="stat-change" style="color:var(--amber)">1 currently booked</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon purple">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zM3 13c0-2.76 2.24-5 5-5s5 2.24 5 5H3z"/></svg>
+          </div>
+          <div class="stat-value">5</div>
+          <div class="stat-label">Registered Users</div>
+          <div class="stat-change" style="color:var(--purple)">3 students, 1 faculty</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Recent Bookings</div>
+              <div class="section-sub">All booking activity this month</div>
+            </div>
+            <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="showView('mybookings', document.querySelector('.nav-item:nth-child(4)'))">View all →</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Resource</th>
+                <th>User</th>
+                <th>Purpose</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="resource-name">APJ Auditorium</div><div class="resource-type">Hall · 600 seats</div></td>
+                <td>Rahul Sharma</td>
+                <td>AI Workshop</td>
+                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">10 Mar</td>
+                <td><span class="badge badge-green">Approved</span></td>
+              </tr>
+              <tr>
+                <td><div class="resource-name">Smart Classroom A205</div><div class="resource-type">Classroom · 80 seats</div></td>
+                <td>Anita Nair</td>
+                <td>Guest Lecture</td>
+                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">11 Mar</td>
+                <td><span class="badge badge-amber">Pending</span></td>
+              </tr>
+              <tr>
+                <td><div class="resource-name">CSE Programming Lab</div><div class="resource-type">Lab · 60 seats</div></td>
+                <td>Karthik R</td>
+                <td>Project Presentation</td>
+                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">12 Mar</td>
+                <td><span class="badge badge-green">Approved</span></td>
+              </tr>
+              <tr>
+                <td><div class="resource-name">Seminar Hall B</div><div class="resource-type">Hall · 150 seats</div></td>
+                <td>Meena Iyer</td>
+                <td>Department Meeting</td>
+                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">13 Mar</td>
+                <td><span class="badge badge-red">Rejected</span></td>
+              </tr>
+              <tr>
+                <td><div class="resource-name">Innovation Lab</div><div class="resource-type">Lab · 40 seats</div></td>
+                <td>Arjun Patel</td>
+                <td>Hackathon Training</td>
+                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">14 Mar</td>
+                <td><span class="badge badge-green">Approved</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-title">Recent Activity</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--green)"></div>
+              <div>
+                <div class="activity-text"><strong>Arjun Patel</strong> booked Innovation Lab for Hackathon Training</div>
+                <div class="activity-time">14 Mar · 10:00–12:00</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--amber)"></div>
+              <div>
+                <div class="activity-text"><strong>Anita Nair</strong> submitted booking for APJ Auditorium</div>
+                <div class="activity-time">15 Mar · Tech Talk</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--red)"></div>
+              <div>
+                <div class="activity-text"><strong>Meena Iyer</strong>'s booking for Seminar Hall B was rejected</div>
+                <div class="activity-time">13 Mar · Admin decision</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--accent)"></div>
+              <div>
+                <div class="activity-text"><strong>Usage recorded</strong> for Workshop at APJ Auditorium</div>
+                <div class="activity-time">10 Mar · 10:05–11:55</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-title">Resource Utilization</div>
+            </div>
+            <div style="padding:16px 20px">
+              <div id="util-bars"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== RESOURCES ======================== -->
+    <div class="view" id="view-resources">
+      <div class="filters-bar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 1a5.5 5.5 0 104.22 9.04l3.12 3.11 1.06-1.06-3.11-3.12A5.5 5.5 0 006.5 1zm0 1.5a4 4 0 110 8 4 4 0 010-8z"/></svg>
+          <input class="search-input" type="text" placeholder="Search resources, locations..." id="resource-search" oninput="filterResources()">
+        </div>
+        <select class="filter-select" id="type-filter" onchange="filterResources()">
+          <option value="">All Types</option>
+          <option value="Hall">Hall</option>
+          <option value="Lab">Lab</option>
+          <option value="Classroom">Classroom</option>
+        </select>
+        <select class="filter-select" id="status-filter" onchange="filterResources()">
+          <option value="">All Status</option>
+          <option value="Available">Available</option>
+          <option value="Booked">Booked</option>
+        </select>
+      </div>
+
+      <div class="resources-grid" id="resources-grid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ======================== MY BOOKINGS ======================== -->
+    <div class="view" id="view-mybookings">
+      <div style="display:flex;gap:10px;margin-bottom:22px;align-items:center;justify-content:space-between">
+        <div class="admin-tabs">
+          <button class="admin-tab active" onclick="filterBookings('all', this)">All</button>
+          <button class="admin-tab" onclick="filterBookings('Approved', this)">Approved</button>
+          <button class="admin-tab" onclick="filterBookings('Pending', this)">Pending</button>
+          <button class="admin-tab" onclick="filterBookings('Rejected', this)">Rejected</button>
+        </div>
+        <button class="btn btn-primary" onclick="showView('resources', document.querySelector('.nav-item:nth-child(3)'))">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm4 8H9v3H7V9H4V7h3V4h2v3h3v2z"/></svg>
+          New Booking
+        </button>
+      </div>
+
+      <div class="bookings-list" id="bookings-list">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ======================== ADMIN PANEL ======================== -->
+    <div class="view" id="view-admin">
+      <div class="admin-tabs" style="margin-bottom:22px">
+        <button class="admin-tab active" onclick="showAdminTab('pending', this)">Pending Approvals</button>
+        <button class="admin-tab" onclick="showAdminTab('all', this)">All Decisions</button>
+        <button class="admin-tab" onclick="showAdminTab('usage', this)">Usage History</button>
+      </div>
+
+      <div id="admin-pending">
+        <div id="pending-cards-container">
+          <div class="pending-header">
+            <div>
+              <div style="font-size:14px;font-weight:500;margin-bottom:4px">Guest Lecture — Smart Classroom A205</div>
+              <div style="font-size:12px;color:var(--text3)">Booking #202 · Submitted by Anita Nair (Faculty, ECE)</div>
+            </div>
+            <span class="badge badge-amber">Awaiting Review</span>
+          </div>
+          <div class="pending-body">
+            <div class="info-block">
+              <div class="info-key">Resource</div>
+              <div class="info-val">Smart Classroom A205</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">Academic Block A · 80 seats</div>
+            </div>
+            <div class="info-block">
+              <div class="info-key">Time Slot</div>
+              <div class="info-val">11 Mar 2026</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace">09:00 – 11:00</div>
+            </div>
+            <div class="info-block">
+              <div class="info-key">Purpose</div>
+              <div class="info-val">Guest Lecture</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">ECE Department</div>
+            </div>
+          </div>
+          <div class="pending-footer">
+            <div class="pending-note">Assigned to: Priya Menon (Admin #2)</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-danger" onclick="handleDecision(this, 'reject')">✕ Reject</button>
+              <button class="btn btn-success" onclick="handleDecision(this, 'approve')">✓ Approve</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pending-card">
+          <div class="pending-header">
+            <div>
+              <div style="font-size:14px;font-weight:500;margin-bottom:4px">Tech Talk — APJ Abdul Kalam Auditorium</div>
+              <div style="font-size:12px;color:var(--text3)">Booking #206 · Submitted by Anita Nair (Faculty, ECE)</div>
+            </div>
+            <span class="badge badge-amber">Awaiting Review</span>
+          </div>
+          <div class="pending-body">
+            <div class="info-block">
+              <div class="info-key">Resource</div>
+              <div class="info-val">APJ Abdul Kalam Auditorium</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">Main Academic Block · 600 seats</div>
+            </div>
+            <div class="info-block">
+              <div class="info-key">Time Slot</div>
+              <div class="info-val">15 Mar 2026</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace">10:00 – 12:00</div>
+            </div>
+            <div class="info-block">
+              <div class="info-key">Purpose</div>
+              <div class="info-val">Tech Talk</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">Open to all departments</div>
+            </div>
+          </div>
+          <div class="pending-footer">
+            <div class="pending-note">Large venue — verify attendee count before approval</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-danger" onclick="handleDecision(this, 'reject')">✕ Reject</button>
+              <button class="btn btn-success" onclick="handleDecision(this, 'approve')">✓ Approve</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="admin-all" style="display:none">
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">All Approval Records</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Approval ID</th>
+                <th>Booking</th>
+                <th>Resource</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:'DM Mono',monospace;color:var(--text3)">#301</td>
+                <td>#201 — AI Workshop</td>
+                <td>APJ Auditorium</td>
+                <td><span class="badge badge-green">Approved</span></td>
+                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">08 Mar</td>
+                <td style="color:var(--text3);font-size:12px">Approved for AI workshop</td>
+              </tr>
+              <tr>
+                <td style="font-family:'DM Mono',monospace;color:var(--text3)">#302</td>
+                <td>#202 — Guest Lecture</td>
+                <td>Smart Classroom A205</td>
+                <td><span class="badge badge-amber">Pending</span></td>
+                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">09 Mar</td>
+                <td style="color:var(--text3);font-size:12px">Waiting for admin review</td>
+              </tr>
+              <tr>
+                <td style="font-family:'DM Mono',monospace;color:var(--text3)">#303</td>
+                <td>#203 — Project Presentation</td>
+                <td>CSE Programming Lab</td>
+                <td><span class="badge badge-green">Approved</span></td>
+                <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">10 Mar</td>
+                <td style="color:var(--text3);font-size:12px">Approved for presentation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="admin-usage" style="display:none">
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">Usage History</div>
+            <div class="section-sub">Actual utilization records with feedback</div>
+          </div>
+          <div class="history-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Usage ID</th>
+                  <th>Resource</th>
+                  <th>Actual Start</th>
+                  <th>Actual End</th>
+                  <th>Feedback</th>
+                  <th>Booking</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-family:'DM Mono',monospace;color:var(--text3)">#401</td>
+                  <td><div class="resource-name">APJ Auditorium</div></td>
+                  <td style="font-family:'DM Mono',monospace;font-size:12px">10 Mar · 10:05</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:12px">10 Mar · 11:55</td>
+                  <td style="font-size:12px;color:var(--green)">Workshop conducted successfully</td>
+                  <td style="font-family:'DM Mono',monospace;color:var(--text3)">#201</td>
+                </tr>
+                <tr>
+                  <td style="font-family:'DM Mono',monospace;color:var(--text3)">#402</td>
+                  <td><div class="resource-name">CSE Programming Lab</div></td>
+                  <td style="font-family:'DM Mono',monospace;font-size:12px">12 Mar · 14:10</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:12px">12 Mar · 15:50</td>
+                  <td style="font-size:12px;color:var(--teal)">Students presented projects</td>
+                  <td style="font-family:'DM Mono',monospace;color:var(--text3)">#203</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal()">
+      <svg viewBox="0 0 16 16" fill="currentColor" style="width:14px;height:14px"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </button>
+    <div class="modal-title" id="modal-resource-name">Book Resource</div>
+    <div class="modal-sub" id="modal-resource-detail">Fill in the details for your booking request</div>
+
+    <div class="form-group">
+      <label class="form-label">Purpose / Event Name</label>
+      <input class="form-input" type="text" id="input-purpose" placeholder="e.g. Project Presentation, Workshop...">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Booking Date</label>
+        <input class="form-input" type="date" id="input-date" value="2026-03-30">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Department</label>
+        <input class="form-input" type="text" id="input-dept" placeholder="CSE, ECE, IT...">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Start Time</label>
+        <input class="form-input" type="time" id="input-start" value="10:00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Time</label>
+        <input class="form-input" type="time" id="input-end" value="12:00">
+      </div>
+    </div>
+
+    <div id="modal-warning" style="display:none; background:var(--red-bg); border:1px solid rgba(240,96,96,0.3); border-radius:var(--radius); padding:10px 14px; margin-top:12px; font-size:13px; color:var(--red);">
+      ⚠️ <span id="modal-warning-text"></span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="submit-btn" onclick="submitBooking()">Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif">
+  <div class="notif-dot"></div>
+  <span id="notif-text">Booking submitted successfully</span>
+</div>
+
+<script>
+let resources = [];
+let bookings = [];
+
+async function loadData() {
+  try {
+    const [resourcesRes, bookingsRes] = await Promise.all([
+      fetch('http://localhost:3000/resources'),
+      fetch('http://localhost:3000/bookings')
+    ]);
+    resources = await resourcesRes.json();
+    bookings = await bookingsRes.json();
+
+    // normalize field names to lowercase
+    resources = resources.map(r => ({
+      id: r.RESOURCE_ID,
+      name: r.RESOURCE_NAME,
+      type: r.RESOURCE_TYPE,
+      capacity: r.CAPACITY,
+      location: r.LOCATION,
+      status: r.AVAILABILITY_STATUS,
+      emoji: r.RESOURCE_TYPE === 'Hall' ? '🏛️' : r.RESOURCE_TYPE === 'Lab' ? '💻' : '📐',
+      cls: r.RESOURCE_TYPE === 'Hall' ? 'rc-hall' : r.RESOURCE_TYPE === 'Lab' ? 'rc-lab' : 'rc-classroom'
+    }));
+
+    bookings = bookings.map(b => ({
+      id: b.BOOKING_ID,
+      resource: b.RESOURCE_NAME,
+      purpose: b.PURPOSE,
+      date: new Date(b.BOOKING_DATE).getDate().toString(),
+      month: new Date(b.BOOKING_DATE).toLocaleString('en', {month:'short'}).toUpperCase(),
+      time: new Date(b.START_TIME).toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'}) + ' – ' + new Date(b.END_TIME).toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'}),
+      status: b.BOOKING_STATUS
+    }));
+
+    renderUtilBars();
+  } catch (err) {
+    console.error('Failed to load data:', err);
+  }
+}
+
+loadData();
+
+let currentFilter = 'all';
+let selectedResource = null;
+
+function showView(viewId, navEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + viewId).classList.add('active');
+  if (navEl) navEl.classList.add('active');
+
+  const titles = { dashboard: ['Dashboard', 'Monday, 30 March 2026'], resources: ['Browse Resources', 'Find and book campus facilities'], mybookings: ['My Bookings', 'Maanya Agrawal · 24BCE5052'], admin: ['Admin Panel', 'Manage approvals and usage records'] };
+  const t = titles[viewId] || ['', ''];
+  document.getElementById('page-title').textContent = t[0];
+  document.getElementById('page-sub').textContent = t[1];
+  if (viewId === 'resources') renderResources(resources);
+  if (viewId === 'mybookings') renderBookings(bookings);
+  if (viewId === 'admin') loadPendingApprovals();
+
+}
+
+function renderResources(list) {
+  const grid = document.getElementById('resources-grid');
+  if (!list.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div class="empty-title">No resources found</div><div class="empty-sub">Try adjusting your filters</div></div>'; return; }
+  grid.innerHTML = list.map(r => `
+    <div class="resource-card">
+      <div class="resource-card-img ${r.cls}">
+        <span>${r.emoji}</span>
+        <div class="availability-dot" style="background:${r.status === 'Available' ? 'var(--green)' : 'var(--red)'}"></div>
+      </div>
+      <div class="resource-card-body">
+        <div class="resource-card-name">${r.name}</div>
+        <div class="resource-card-loc">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a5 5 0 00-5 5c0 3.5 5 9 5 9s5-5.5 5-9a5 5 0 00-5-5zm0 6.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
+          ${r.location}
+        </div>
+        <div class="resource-meta">
+          <span class="cap-info">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zM3 13c0-2.76 2.24-5 5-5s5 2.24 5 5H3z"/></svg>
+            ${r.capacity} seats
+          </span>
+          <span class="badge ${r.status === 'Available' ? 'badge-green' : 'badge-red'}">${r.status}</span>
+        </div>
+        <button class="btn ${r.status === 'Available' ? 'btn-primary' : 'btn-ghost'}" style="width:100%;justify-content:center" onclick='openModal(${JSON.stringify(r)})' ${r.status !== 'Available' ? 'disabled' : ''}>
+          ${r.status === 'Available' ? 'Book Now' : 'Currently Booked'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterResources() {
+  const search = document.getElementById('resource-search').value.toLowerCase();
+  const type = document.getElementById('type-filter').value;
+  const status = document.getElementById('status-filter').value;
+  const filtered = resources.filter(r =>
+    (r.name.toLowerCase().includes(search) || r.location.toLowerCase().includes(search)) &&
+    (!type || r.type === type) &&
+    (!status || r.status === status)
+  );
+  renderResources(filtered);
+}
+
+function renderBookings(list) {
+  const filtered = currentFilter === 'all' ? list : list.filter(b => b.status === currentFilter);
+  const container = document.getElementById('bookings-list');
+  if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No bookings found</div><div class="empty-sub">Make a new booking to get started</div></div>'; return; }
+  const badgeMap = { Approved: 'badge-green', Pending: 'badge-amber', Rejected: 'badge-red' };
+  container.innerHTML = filtered.map(b => `
+    <div class="booking-item">
+      <div class="booking-date-block">
+        <div class="booking-month">${b.month}</div>
+        <div class="booking-day">${b.date}</div>
+      </div>
+      <div class="booking-details">
+        <div class="booking-purpose">${b.purpose}</div>
+        <div class="booking-resource">
+          <svg viewBox="0 0 16 16" fill="currentColor" style="width:12px;height:12px"><path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v2a1 1 0 01-1 1H3a1 1 0 01-1-1V3zm0 6a1 1 0 011-1h10a1 1 0 011 1v2a1 1 0 01-1 1H3a1 1 0 01-1-1V9z"/></svg>
+          ${b.resource}
+        </div>
+        <div class="booking-time">
+          <svg viewBox="0 0 16 16" fill="currentColor" style="width:11px;height:11px"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2a5 5 0 110 10A5 5 0 018 3zm.5 2H7v4.5l3.2 1.9.8-1.3-2.5-1.5V5z"/></svg>
+          ${b.time}
+        </div>
+      </div>
+      <div class="booking-actions">
+        <span class="badge ${badgeMap[b.status]}">${b.status}</span>
+        <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">#${b.id}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterBookings(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderBookings(bookings);
+}
+
+function openModal(resource) {
+  selectedResource = resource;
+  document.getElementById('modal-resource-name').textContent = 'Book — ' + resource.name;
+  document.getElementById('modal-resource-detail').textContent = resource.type + ' · ' + resource.location + ' · ' + resource.capacity + ' seats';
+  document.getElementById('booking-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('booking-modal').classList.remove('open');
+}
+
+async function submitBooking() {
+  const purpose = document.getElementById('input-purpose').value.trim();
+  const date = document.getElementById('input-date').value;
+  const startTime = document.getElementById('input-start').value;
+  const endTime = document.getElementById('input-end').value;
+
+  // hide any previous warning
+  document.getElementById('modal-warning').style.display = 'none';
+
+  if (!purpose || !date || !startTime || !endTime) {
+    showModalWarning('Please fill in all fields before submitting.');
+    return;
+  }
+
+  if (startTime >= endTime) {
+    showModalWarning('End time must be after start time.');
+    return;
+  }
+
+  const submitBtn = document.getElementById('submit-btn');
+  submitBtn.textContent = 'Checking...';
+  submitBtn.disabled = true;
+
+  const bookingData = {
+    purpose,
+    booking_date: date,
+    start_time: date + ' ' + startTime,
+    end_time: date + ' ' + endTime,
+    user_id: 1,
+    resource_id: selectedResource.id
+  };
+
+  try {
+    const res = await fetch('http://localhost:3000/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookingData)
+    });
+
+    const data = await res.json();
+
+    if (res.status === 409) {
+      showModalWarning(data.message);
+      submitBtn.textContent = 'Submit Request';
+      submitBtn.disabled = false;
+      return;
+    }
+
+    closeModal();
+    showNotif('Booking submitted for ' + selectedResource.name);
+    await loadData();
+
+  } catch (err) {
+    showModalWarning('Could not connect to server. Make sure Node is running.');
+    submitBtn.textContent = 'Submit Request';
+    submitBtn.disabled = false;
+  }
+}
+
+function showModalWarning(msg) {
+  const box = document.getElementById('modal-warning');
+  document.getElementById('modal-warning-text').textContent = msg;
+  box.style.display = 'block';
+}
+
+async function loadPendingApprovals() {
+  try {
+    const res = await fetch('http://localhost:3000/pending');
+    const pending = await res.json();
+    const container = document.getElementById('pending-cards-container');
+
+    if (!pending.length) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">No pending approvals</div><div class="empty-sub">All bookings have been reviewed</div></div>';
+      return;
+    }
+
+    container.innerHTML = pending.map(p => `
+      <div class="pending-card" id="pending-${p.BOOKING_ID}">
+        <div class="pending-header">
+          <div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:4px">${p.PURPOSE} — ${p.RESOURCE_NAME}</div>
+            <div style="font-size:12px;color:var(--text3)">Booking #${p.BOOKING_ID} · Submitted by ${p.USER_NAME} (${p.ROLE}, ${p.DEPARTMENT})</div>
+          </div>
+          <span class="badge badge-amber">Awaiting Review</span>
+        </div>
+        <div class="pending-body">
+          <div class="info-block">
+            <div class="info-key">Resource</div>
+            <div class="info-val">${p.RESOURCE_NAME}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">${p.LOCATION} · ${p.CAPACITY} seats</div>
+          </div>
+          <div class="info-block">
+            <div class="info-key">Time Slot</div>
+            <div class="info-val">${p.BOOKING_DATE}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace">${p.START_TIME} – ${p.END_TIME}</div>
+          </div>
+          <div class="info-block">
+            <div class="info-key">Purpose</div>
+            <div class="info-val">${p.PURPOSE}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">${p.DEPARTMENT}</div>
+          </div>
+        </div>
+        <div class="pending-footer">
+          <div class="pending-note">Booking ID #${p.BOOKING_ID}</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-danger" onclick="handleDecision(${p.BOOKING_ID}, 'Rejected')">✕ Reject</button>
+            <button class="btn btn-success" onclick="handleDecision(${p.BOOKING_ID}, 'Approved')">✓ Approve</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error('Failed to load pending:', err);
+  }
+}
+
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  document.getElementById('notif-text').textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3200);
+}
+
+function showAdminTab(tab, el) {
+  document.getElementById('admin-pending').style.display = tab === 'pending' ? 'block' : 'none';
+  document.getElementById('admin-all').style.display = tab === 'all' ? 'block' : 'none';
+  document.getElementById('admin-usage').style.display = tab === 'usage' ? 'block' : 'none';
+  document.querySelectorAll('#view-admin .admin-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function handleDecision(bookingId, status) {
+  console.log('handleDecision called', bookingId, status);
+  try {
+    const res = await fetch('http://localhost:3000/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_id: bookingId, status })
+    });
+    console.log('Response status:', res.status);
+    const data = await res.json();
+    console.log('Response data:', data);
+
+    if (!data.success) {
+      showWarning('Failed to update booking status.');
+      return;
+    }
+
+    const card = document.getElementById('pending-' + bookingId);
+    card.style.opacity = '0.4';
+    card.style.pointerEvents = 'none';
+    showNotif(status === 'Approved' ? '✓ Booking #' + bookingId + ' approved' : '✕ Booking #' + bookingId + ' rejected');
+    setTimeout(() => {
+      card.style.transition = 'all 0.3s';
+      card.style.maxHeight = '0';
+      card.style.overflow = 'hidden';
+      card.style.margin = '0';
+      setTimeout(() => card.remove(), 300);
+    }, 600);
+
+    await loadData();
+  } catch (err) {
+    console.log('Error:', err);
+    showWarning('Failed to update booking status.');
+  }
+}
+
+// Render utilization bars
+function renderUtilBars() {
+  const data = [
+    { name: 'APJ Auditorium', pct: 80, color: 'var(--accent)' },
+    { name: 'CSE Prog. Lab', pct: 65, color: 'var(--green)' },
+    { name: 'Innovation Lab', pct: 45, color: 'var(--teal)' },
+    { name: 'Seminar Hall B', pct: 30, color: 'var(--purple)' },
+    { name: 'Smart Classroom', pct: 55, color: 'var(--amber)' }
+  ];
+  document.getElementById('util-bars').innerHTML = data.map(d => `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px;color:var(--text2)">${d.name}</span>
+        <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)">${d.pct}%</span>
+      </div>
+      <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${d.pct}%;background:${d.color};border-radius:2px;transition:width 1s ease"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+
+document.getElementById('booking-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
